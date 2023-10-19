@@ -39,6 +39,7 @@ import ExtensionText from "./text";
 import ExtensionDraggable from "./draggable";
 import ExtensionNodeSelected from "./node-selected";
 import ExtensionTrailingNode from "./trailing-node";
+import MyCardExtension from "./my-card";
 
 const allExtensions = [
   ExtensionBlockquote,
@@ -95,6 +96,7 @@ const allExtensions = [
   ExtensionColumn,
   ExtensionNodeSelected,
   ExtensionTrailingNode,
+  MyCardExtension,
 ];
 
 export {
@@ -138,4 +140,5 @@ export {
   ExtensionColumn,
   ExtensionNodeSelected,
   ExtensionTrailingNode,
+  MyCardExtension,
 };

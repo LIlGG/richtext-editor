@@ -48,6 +48,7 @@ import {
   ExtensionColumn,
   ExtensionNodeSelected,
   ExtensionTrailingNode,
+  MyCardExtension,
 } from "@halo-dev/richtext-editor";
 
 const content = useLocalStorage("content", "");
@@ -112,6 +113,7 @@ const editor = useEditor({
     ExtensionColumn,
     ExtensionNodeSelected,
     ExtensionTrailingNode,
+    MyCardExtension,
   ],
   onUpdate: () => {
     content.value = editor.value?.getHTML() + "";
