@@ -18,7 +18,7 @@ export default plugin;
 
 export { RichTextEditor };
 
-export * from "@tiptap/vue-3";
+export * from "./editor";
 export * from "./extensions";
 export * from "./components";
 

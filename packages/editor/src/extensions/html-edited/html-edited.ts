@@ -3,6 +3,7 @@ import type { Editor } from "@tiptap/vue-3";
 import { markRaw } from "vue";
 import MdiCollage from "~icons/mdi/collage";
 import { CodeMirrorView } from "./code-mirror-view";
+import { HtmlNode } from "./html-node";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -15,13 +16,17 @@ declare module "@tiptap/core" {
 const HtmlEdited = Node.create({
   name: "html_edited",
 
-  content: "html+",
+  content: "text*",
 
   group: "block",
 
   code: true,
 
   defining: true,
+
+  addExtensions() {
+    return [HtmlNode];
+  },
 
   addOptions() {
     return {

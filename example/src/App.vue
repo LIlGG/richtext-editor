@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import "@halo-dev/richtext-editor/dist/style.css";
-import { computed, watchEffect, markRaw } from "vue";
+import { computed, watchEffect } from "vue";
 import { unified } from "unified";
 import rehypeParse from "rehype-parse";
 import rehypeFormat from "rehype-format";
@@ -48,6 +48,8 @@ import {
   ExtensionColumn,
   ExtensionNodeSelected,
   ExtensionTrailingNode,
+  ExtensionHtmlEdited,
+  // getHTML,
 } from "@halo-dev/richtext-editor";
 
 const content = useLocalStorage("content", "");
@@ -112,11 +114,23 @@ const editor = useEditor({
     ExtensionColumn,
     ExtensionNodeSelected,
     ExtensionTrailingNode,
+    ExtensionHtmlEdited,
   ],
   onUpdate: () => {
     content.value = editor.value?.getHTML() + "";
   },
 });
+
+// nextTick(() => {
+//   const text = getHTML(editor.value);
+//   console.log(
+//     unified()
+//       .use(rehypeParse)
+//       .use(rehypeFormat)
+//       .use(rehypeStringify)
+//       .processSync(text),
+//   );
+// });
 
 const formatContent = computed(() => {
   return unified()
@@ -129,17 +143,6 @@ const formatContent = computed(() => {
 watchEffect(() => {
   console.log(String(formatContent.value));
 });
-
-const locales = [
-  {
-    code: "zh-CN",
-    label: "中文",
-  },
-  {
-    code: "en-US",
-    label: "English",
-  },
-];
 
 const locale = useLocalStorage("locale", "zh-CN");
 </script>

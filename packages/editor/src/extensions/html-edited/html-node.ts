@@ -1,10 +1,11 @@
-import { Node } from "@tiptap/core";
+import Text from "@tiptap/extension-text";
 
-const HtmlNode = Node.create({
-  name: "html",
-  group: "inline",
-  inline: true,
-  content: "text*",
+export const HtmlNode = Text.extend({
+  renderHTML({ node }) {
+    const doc = document.createElement("div");
+    doc.innerHTML = node.text as string;
+    return {
+      dom: doc,
+    };
+  },
 });
-
-export default HtmlNode;

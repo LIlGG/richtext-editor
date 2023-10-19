@@ -17,6 +17,7 @@ import {
   syntaxHighlighting,
   defaultHighlightStyle,
 } from "@codemirror/language";
+import { HtmlNode } from "./html-node";
 
 export class CodeMirrorView implements NodeView {
   editor: Editor;
@@ -142,7 +143,6 @@ export class CodeMirrorView implements NodeView {
   }
 
   update(node: PMNode): boolean {
-    console.log("node view update => ", node);
     if (node.type != this.node.type) {
       return false;
     }
