@@ -1,14 +1,27 @@
 import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
-import { Editor, isActive, mergeAttributes, Node } from "@tiptap/core";
-import type { EditorState } from "@tiptap/pm/state";
+import {
+  Editor,
+  findParentNode,
+  isActive,
+  mergeAttributes,
+  Node,
+} from "@tiptap/core";
+import {
+  NodeSelection,
+  type EditorState,
+  type Selection,
+  Transaction,
+} from "@tiptap/pm/state";
 import { markRaw } from "vue";
 import MdiWeb from "~icons/mdi/web";
-import MdiBorderAllVariant from "~icons/mdi/border-all-variant";
 import MdiBorderNoneVariant from "~icons/mdi/border-none-variant";
+import { liftTarget } from "@tiptap/pm/transform";
+import { Node as PMNode } from "@tiptap/pm/model";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     myCard: {
+      insertMyCard: () => ReturnType;
       setMyCard: () => ReturnType;
       unsetMyCard: () => ReturnType;
     };
@@ -95,12 +108,12 @@ const MyCardExtension = Node.create<ExtensionOptions>({
     return {
       getCommandMenuItems() {
         return {
-          priority: 10,
+          priority: 50,
           icon: markRaw(MdiWeb),
-          title: "隐藏内容",
+          title: "插入隐藏内容",
           keywords: ["隐藏内容", "yincangneirong"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
-            editor.chain().focus().deleteRange(range).setMyCard().run();
+            editor.chain().focus().deleteRange(range).insertMyCard().run();
           },
         };
       },
@@ -108,13 +121,6 @@ const MyCardExtension = Node.create<ExtensionOptions>({
         return {
           pluginKey: "myCardBubbleMenu",
           shouldShow: ({ state }: { state: EditorState }) => {
-            if (
-              editor
-                .getAttributes(MyCardExtension.name)
-                .class?.indexOf("my-card") === -1
-            ) {
-              return false;
-            }
             return isActive(state, MyCardExtension.name);
           },
           getRenderContainer(node: HTMLElement) {
@@ -135,27 +141,14 @@ const MyCardExtension = Node.create<ExtensionOptions>({
             {
               priority: 10,
               props: {
-                icon:
-                  editor
-                    .getAttributes(MyCardExtension.name)
-                    .class?.indexOf("my-card") != -1
-                    ? markRaw(MdiBorderAllVariant)
-                    : undefined,
+                icon: isActive(editor.state, MyCardExtension.name)
+                  ? markRaw(MdiBorderNoneVariant)
+                  : undefined,
                 visible: () => {
-                  return (
-                    editor
-                      .getAttributes(MyCardExtension.name)
-                      .class?.indexOf("my-card") != -1
-                  );
+                  return isActive(editor.state, MyCardExtension.name);
                 },
                 action: () => {
-                  editor
-                    .chain()
-                    .updateAttributes(MyCardExtension.name, {
-                      class: "",
-                    })
-                    .focus()
-                    .run();
+                  editor.chain().focus().unsetMyCard().run();
                 },
                 title: "取消隐藏内容",
               },
@@ -180,31 +173,102 @@ const MyCardExtension = Node.create<ExtensionOptions>({
 
   addCommands() {
     return {
-      setMyCard:
+      insertMyCard:
         () =>
-        ({ chain, state }) => {
-          const content = state.selection.content();
+        ({ chain }) => {
           return chain()
             .insertContent({
               type: this.name,
-              content:
-                content.size > 0
-                  ? content.content.toJSON()
-                  : [
-                      {
-                        type: "paragraph",
-                      },
-                    ],
+              content: [
+                {
+                  type: "paragraph",
+                },
+              ],
             })
             .run();
         },
-    //   unsetMyCard:
-    //     () =>
-    //     ({ chain, state }) => {
-    //         return chain().clearNodes
-    //     },
+      setMyCard:
+        () =>
+        ({ chain }) => {
+          return chain().wrapIn(this.type).run();
+        },
+      unsetMyCard:
+        () =>
+        ({ view, state, tr, dispatch }) => {
+          const $pos = findMyCard(state.selection);
+          if (!$pos) {
+            return false;
+          }
+          tr.setSelection(new NodeSelection(tr.doc.resolve($pos.pos)));
+          clearNodes({ state, tr, dispatch });
+          view.dispatch(tr);
+          return true;
+        },
     };
   },
 });
+
+export const clearNodes = ({
+  state,
+  tr,
+  dispatch,
+}: {
+  state: EditorState;
+  tr: Transaction;
+  dispatch: ((args?: any) => any) | undefined;
+}) => {
+  const { selection } = tr;
+  const { ranges } = selection;
+  if (!dispatch) {
+    return true;
+  }
+
+  ranges.forEach(({ $from, $to }) => {
+    state.doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
+      if (node.type.isText) {
+        return;
+      }
+
+      const { doc, mapping } = tr;
+      const $mappedFrom = doc.resolve(mapping.map(pos));
+      const $mappedTo = doc.resolve(mapping.map(pos + node.nodeSize));
+      const nodeRange = $mappedFrom.blockRange($mappedTo);
+
+      if (!nodeRange) {
+        return;
+      }
+
+      const targetLiftDepth = liftTarget(nodeRange);
+
+      if (targetLiftDepth || targetLiftDepth === 0) {
+        tr.lift(nodeRange, targetLiftDepth);
+      }
+    });
+  });
+
+  return true;
+};
+
+const findMyCard = (
+  selection: Selection,
+):
+  | {
+      pos: number;
+      start: number;
+      depth: number;
+      node: PMNode;
+    }
+  | undefined => {
+  return findParentNode((node) => node.type.name === MyCardExtension.name)(
+    selection,
+  ) as
+    | {
+        pos: number;
+        start: number;
+        depth: number;
+        node: PMNode;
+      }
+    | undefined;
+};
 
 export default MyCardExtension;
