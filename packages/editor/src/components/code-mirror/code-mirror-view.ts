@@ -8,7 +8,7 @@ import {
   type KeyBinding,
   drawSelection,
 } from "@codemirror/view";
-import { html } from "@codemirror/lang-html";
+import { type Extension } from "@codemirror/state";
 import { defaultKeymap } from "@codemirror/commands";
 import { Selection, TextSelection } from "@tiptap/pm/state";
 import { exitCode } from "@tiptap/pm/commands";
@@ -17,7 +17,7 @@ import {
   syntaxHighlighting,
   defaultHighlightStyle,
 } from "@codemirror/language";
-import { HtmlNode } from "./html-node";
+import { autocompletion } from "@codemirror/autocomplete";
 
 export class CodeMirrorView implements NodeView {
   editor: Editor;
@@ -29,7 +29,12 @@ export class CodeMirrorView implements NodeView {
   contentDOM?: HTMLElement | null | undefined;
   updating: boolean;
 
-  constructor(editor: Editor, node: PMNode, getPos: () => number) {
+  constructor(
+    editor: Editor,
+    node: PMNode,
+    getPos: () => number,
+    extension?: Extension[],
+  ) {
     const { view } = editor;
     this.editor = editor;
     this.node = node;
@@ -40,11 +45,12 @@ export class CodeMirrorView implements NodeView {
     this.cm = new CodeMirror({
       doc: this.node.textContent,
       extensions: [
+        autocompletion(),
         cmKeymap.of([...this.codeMirrorKeymap(), ...defaultKeymap]),
         drawSelection(),
         syntaxHighlighting(defaultHighlightStyle),
-        html(),
         CodeMirror.updateListener.of((update) => this.forwardUpdate(update)),
+        ...extension!,
       ],
     });
 

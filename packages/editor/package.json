@@ -49,10 +49,13 @@
   },
   "dependencies": {
     "@ckpack/vue-color": "^1.5.0",
+    "@codemirror/autocomplete": "^6.10.2",
     "@codemirror/commands": "^6.3.0",
     "@codemirror/lang-html": "^6.4.6",
+    "@codemirror/lang-markdown": "^6.2.2",
     "@codemirror/language": "^6.9.1",
     "@codemirror/language-data": "^6.3.1",
+    "@codemirror/state": "^6.3.1",
     "@codemirror/view": "^6.21.3",
     "@lezer/highlight": "1.1.6",
     "@tiptap/core": "^2.1.10",

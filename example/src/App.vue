@@ -49,7 +49,7 @@ import {
   ExtensionNodeSelected,
   ExtensionTrailingNode,
   ExtensionHtmlEdited,
-  // getHTML,
+  ExtensionMarkdownEdited,
 } from "@halo-dev/richtext-editor";
 
 const content = useLocalStorage("content", "");
@@ -115,22 +115,12 @@ const editor = useEditor({
     ExtensionNodeSelected,
     ExtensionTrailingNode,
     ExtensionHtmlEdited,
+    ExtensionMarkdownEdited,
   ],
   onUpdate: () => {
     content.value = editor.value?.getHTML() + "";
   },
 });
-
-// nextTick(() => {
-//   const text = getHTML(editor.value);
-//   console.log(
-//     unified()
-//       .use(rehypeParse)
-//       .use(rehypeFormat)
-//       .use(rehypeStringify)
-//       .processSync(text),
-//   );
-// });
 
 const formatContent = computed(() => {
   return unified()

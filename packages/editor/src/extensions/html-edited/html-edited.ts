@@ -1,10 +1,12 @@
 import { mergeAttributes, Node } from "@tiptap/core";
-import type { Editor } from "@tiptap/vue-3";
+import type { Editor, Range } from "@tiptap/vue-3";
 import { markRaw } from "vue";
 import MdiCollage from "~icons/mdi/collage";
-import { CodeMirrorView } from "./code-mirror-view";
+import { CodeMirrorView } from "../../components/code-mirror/code-mirror-view";
 import { HtmlNode } from "./html-node";
-
+import { Fragment } from "@tiptap/pm/model";
+import { html } from "@codemirror/lang-html";
+const temporaryDocument = document.implementation.createHTMLDocument();
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     htmlEdited: {
@@ -20,13 +22,11 @@ const HtmlEdited = Node.create({
 
   group: "block",
 
-  code: true,
-
   defining: true,
 
-  addExtensions() {
-    return [HtmlNode];
-  },
+  // addExtensions() {
+  //   return [HtmlNode];
+  // },
 
   addOptions() {
     return {
@@ -49,15 +49,21 @@ const HtmlEdited = Node.create({
 
   addNodeView() {
     return ({ editor, node, getPos }) =>
-      new CodeMirrorView(editor, node, getPos as () => number);
+      new CodeMirrorView(editor, node, getPos as () => number, [
+        html({
+          matchClosingTags: true,
+          autoCloseTags: true,
+          selfClosingTags: true,
+        }),
+      ]);
   },
 
   addCommands() {
     return {
       addHtmlEdited:
         () =>
-        ({ commands }) => {
-          return commands.setNode(this.name);
+        ({ chain }) => {
+          return chain().setNode(this.type).run();
         },
     };
   },
@@ -66,16 +72,32 @@ const HtmlEdited = Node.create({
     return [
       {
         tag: "div[class=html-edited]",
+        getContent: (node, schema) => {
+          const htmlNode = (node as HTMLElement).getElementsByClassName(
+            "html-container",
+          );
+          console.log(htmlNode);
+          if (htmlNode.length === 0) {
+            return Fragment.empty;
+          }
+          const textNode = schema.text(htmlNode[0].innerHTML);
+          return Fragment.from(textNode);
+        },
       },
     ];
   },
 
-  renderHTML({ HTMLAttributes }) {
-    return [
-      "div",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      0,
-    ];
+  renderHTML({ HTMLAttributes, node }) {
+    const content = node.content;
+    if (content.size === 0) {
+      return ["div", mergeAttributes(HTMLAttributes, {})];
+    }
+    const container = temporaryDocument.createElement("div");
+    container.classList.add("html-container");
+    container.innerHTML = content.toJSON()[0].text;
+    return {
+      dom: container,
+    };
   },
 });
 
