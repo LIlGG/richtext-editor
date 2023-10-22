@@ -2,10 +2,13 @@ import { mergeAttributes, Node } from "@tiptap/core";
 import type { Editor, Range } from "@tiptap/vue-3";
 import { markRaw } from "vue";
 import MdiCollage from "~icons/mdi/collage";
-import { CodeMirrorView } from "../../components/code-mirror/code-mirror-view";
-import { MarkdownNode } from "./markdown-node";
+import { CodeMirrorView } from "./code-mirror-view";
 import { Fragment } from "@tiptap/pm/model";
 import { markdown } from "@codemirror/lang-markdown";
+import { marked } from "marked";
+import TurndownService from "turndown";
+const temporaryDocument = document.implementation.createHTMLDocument();
+const turndownService = new TurndownService();
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -23,10 +26,6 @@ const MarkdownEdited = Node.create({
   group: "block",
 
   defining: true,
-
-  // addExtensions() {
-  //   return [MarkdownNode];
-  // },
 
   addOptions() {
     return {
@@ -67,27 +66,31 @@ const MarkdownEdited = Node.create({
       {
         tag: "div[class=markdown-edited]",
         getContent: (node, schema) => {
-          const markdownNode = (node as HTMLElement).getElementsByClassName(
-            "markdown-container",
-          );
-
-          if (markdownNode.length === 0) {
+          const htmlNode = node as HTMLElement;
+          if (!htmlNode) {
             return Fragment.empty;
           }
-
-          const textNode = schema.text(markdownNode[0].innerHTML);
+          // html covert to markdown
+          const markdown = turndownService.turndown(htmlNode.innerHTML);
+          const textNode = schema.text(markdown);
           return Fragment.from(textNode);
         },
       },
     ];
   },
 
-  renderHTML({ HTMLAttributes }) {
-    return [
-      "div",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      0,
-    ];
+  renderHTML({ HTMLAttributes, node }) {
+    const content = node.content;
+    if (!content.firstChild) {
+      return ["div", mergeAttributes(HTMLAttributes, {})];
+    }
+    const container = temporaryDocument.createElement("div");
+    container.classList.add("markdown-edited");
+    // markdown covert to html
+    container.innerHTML = marked.parse(content.firstChild.text || "");
+    return {
+      dom: container,
+    };
   },
 });
 

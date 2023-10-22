@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 importers:
 
   .:
@@ -262,12 +258,18 @@ importers:
       lowlight:
         specifier: ^3.0.0
         version: 3.0.0
+      marked:
+        specifier: ^9.1.2
+        version: 9.1.2
       scroll-into-view-if-needed:
         specifier: ^3.1.0
         version: 3.1.0
       tippy.js:
         specifier: ^6.3.7
         version: 6.3.7
+      turndown:
+        specifier: ^7.1.2
+        version: 7.1.2
       vue:
         specifier: ^3.2.37
         version: 3.3.4
@@ -281,6 +283,9 @@ importers:
       '@intlify/unplugin-vue-i18n':
         specifier: ^1.2.0
         version: 1.2.0(vue-i18n@9.4.1)
+      '@types/turndown':
+        specifier: ^5.0.3
+        version: 5.0.3
       '@vue/compiler-sfc':
         specifier: ^3.3.4
         version: 3.3.4
@@ -2210,6 +2215,10 @@ packages:
     resolution: {integrity: sha512-THo502dA5PzG/sfQH+42Lw3fvmYkceefOspdCwpHRul8ik2Jv1K8I5OZz1AT3/rs46kwgMCe9bSBmDLYkkOMGg==}
     dev: true
 
+  /@types/turndown@5.0.3:
+    resolution: {integrity: sha512-2PCZA9g/dkeHIGTf6ESMOD3Gz5RMpDzODtvlBbkLAdtKa/yTQDAFudDEVolHjaBUnu8ugd8BeTCWk4x0STnqkA==}
+    dev: true
+
   /@types/unist@2.0.8:
     resolution: {integrity: sha512-d0XxK3YTObnWVp6rZuev3c49+j4Lo8g4L1ZRm9z5L0xpoZycUPshHgczK5gsUMaZOstjVYYi09p5gYvUtfChYw==}
     dev: false
@@ -3504,6 +3513,10 @@ packages:
     dependencies:
       webidl-conversions: 7.0.0
     dev: true
+
+  /domino@2.1.6:
+    resolution: {integrity: sha512-3VdM/SXBZX2omc9JF9nOPCtDaYQ67BGp5CoLpIQlO2KCAPETs8TcDHacF26jXadGbvUteZzRTeos2fhID5+ucQ==}
+    dev: false
 
   /dot-prop@6.0.1:
     resolution: {integrity: sha512-tE7ztYzXHIeyvc7N+hR3oi7FIbf/NIjVP9hmAt3yMXzrQ072/fpjGLx2GxNxGxUl5V73MEqYzioOMoVhGMJ5cA==}
@@ -5271,6 +5284,12 @@ packages:
       uc.micro: 1.0.6
     dev: false
 
+  /marked@9.1.2:
+    resolution: {integrity: sha512-qoKMJqK0w6vkLk8+KnKZAH6neUZSNaQqVZ/h2yZ9S7CbLuFHyS2viB0jnqcWF9UKjwsAbMrQtnQhdmdvOVOw9w==}
+    engines: {node: '>= 16'}
+    hasBin: true
+    dev: false
+
   /material-colors@1.2.6:
     resolution: {integrity: sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==}
     dev: false
@@ -7033,6 +7052,12 @@ packages:
     resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
     dev: true
 
+  /turndown@7.1.2:
+    resolution: {integrity: sha512-ntI9R7fcUKjqBP6QU8rBK2Ehyt8LAzt3UBT9JR9tgo6GtuKvyUzpayWmeMKJw1DPdXzktvtIT8m2mVXz+bL/Qg==}
+    dependencies:
+      domino: 2.1.6
+    dev: false
+
   /type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
@@ -7895,3 +7920,7 @@ packages:
     dependencies:
       is-number: registry.npmmirror.com/is-number@7.0.0
     dev: true
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false

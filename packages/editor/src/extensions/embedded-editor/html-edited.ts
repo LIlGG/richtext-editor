@@ -2,8 +2,7 @@ import { mergeAttributes, Node } from "@tiptap/core";
 import type { Editor, Range } from "@tiptap/vue-3";
 import { markRaw } from "vue";
 import MdiCollage from "~icons/mdi/collage";
-import { CodeMirrorView } from "../../components/code-mirror/code-mirror-view";
-import { HtmlNode } from "./html-node";
+import { CodeMirrorView } from "./code-mirror-view";
 import { Fragment } from "@tiptap/pm/model";
 import { html } from "@codemirror/lang-html";
 const temporaryDocument = document.implementation.createHTMLDocument();
@@ -24,15 +23,8 @@ const HtmlEdited = Node.create({
 
   defining: true,
 
-  // addExtensions() {
-  //   return [HtmlNode];
-  // },
-
   addOptions() {
     return {
-      HTMLAttributes: {
-        class: "html-edited",
-      },
       getCommandMenuItems() {
         return {
           priority: 1,
@@ -73,14 +65,11 @@ const HtmlEdited = Node.create({
       {
         tag: "div[class=html-edited]",
         getContent: (node, schema) => {
-          const htmlNode = (node as HTMLElement).getElementsByClassName(
-            "html-container",
-          );
-          console.log(htmlNode);
-          if (htmlNode.length === 0) {
+          const htmlNode = node as HTMLElement;
+          if (!htmlNode) {
             return Fragment.empty;
           }
-          const textNode = schema.text(htmlNode[0].innerHTML);
+          const textNode = schema.text(htmlNode.innerHTML);
           return Fragment.from(textNode);
         },
       },
@@ -93,7 +82,7 @@ const HtmlEdited = Node.create({
       return ["div", mergeAttributes(HTMLAttributes, {})];
     }
     const container = temporaryDocument.createElement("div");
-    container.classList.add("html-container");
+    container.classList.add("html-edited");
     container.innerHTML = content.toJSON()[0].text;
     return {
       dom: container,

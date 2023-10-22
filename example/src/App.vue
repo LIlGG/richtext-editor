@@ -48,7 +48,7 @@ import {
   ExtensionColumn,
   ExtensionNodeSelected,
   ExtensionTrailingNode,
-  ExtensionHtmlEdited,
+  ExtensionHTMLEdited,
   ExtensionMarkdownEdited,
 } from "@halo-dev/richtext-editor";
 
@@ -114,7 +114,7 @@ const editor = useEditor({
     ExtensionColumn,
     ExtensionNodeSelected,
     ExtensionTrailingNode,
-    ExtensionHtmlEdited,
+    ExtensionHTMLEdited,
     ExtensionMarkdownEdited,
   ],
   onUpdate: () => {
